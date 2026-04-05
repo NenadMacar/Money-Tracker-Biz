@@ -11,3 +11,9 @@ id = "WQ53_awZkbGjInMd1p13e"
 uri = "file://artifacts/financije-app/assets/images/icon.png"
 type = "image"
 title = "MoFi ikona — mobilni sa tekstom"
+
+[[outputs]]
+id = "Lx7sC_sFhtgj32fuS6tri"
+uri = "file://.canvas/assets/mofi_qr.png"
+type = "image"
+title = "QR kod — skeniraj u Expo Go"
