@@ -147,73 +147,50 @@ export default function AddTransactionModal({
             />
           </View>
 
-          {/* Date */}
-          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{t("mod_date")}</Text>
-          <View style={[styles.dateRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Feather name="calendar" size={16} color={colors.mutedForeground} />
-            <TextInput
-              style={[styles.dateInput, { color: colors.foreground }]}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.mutedForeground}
-              value={date}
-              onChangeText={setDate}
-              testID="date-input"
-            />
-          </View>
-
-          {/* Description */}
-          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{t("mod_description")}</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
-            placeholder={t("mod_descriptionPlaceholder")}
-            placeholderTextColor={colors.mutedForeground}
-            value={description}
-            onChangeText={setDescription}
-            testID="description-input"
-          />
-
-          {/* Client / Partner */}
+          {/* Client / Partner — top of form, very visible */}
           <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{t("mod_contact")}</Text>
           {contacts.length === 0 ? (
             <View style={[styles.noContactBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Feather name="users" size={14} color={colors.mutedForeground} />
+              <Feather name="users" size={16} color={colors.mutedForeground} />
               <Text style={[styles.noContactText, { color: colors.mutedForeground }]}>{t("mod_noContacts")}</Text>
+            </View>
+          ) : selectedContact ? (
+            <View style={[styles.selectedContactRow, { backgroundColor: colors.primary + "15", borderColor: colors.primary + "40" }]}>
+              <View style={[styles.contactItemAvatar, { backgroundColor: colors.primary + "25" }]}>
+                <Text style={[styles.contactItemInitial, { color: colors.primary }]}>
+                  {selectedContact.name.charAt(0).toUpperCase()}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.selectedContactName, { color: colors.primary }]} numberOfLines={1}>
+                  {selectedContact.name}
+                </Text>
+                <Text style={[styles.selectedContactType, { color: colors.mutedForeground }]}>
+                  {t(`con_${selectedContact.type}` as any)}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => { setContactId(undefined); setContactPickerOpen(false); }}
+                style={styles.clearContactBtn}
+              >
+                <Feather name="x" size={16} color={colors.mutedForeground} />
+              </TouchableOpacity>
             </View>
           ) : (
             <>
-              {/* Selected contact pill OR picker trigger */}
-              {selectedContact ? (
-                <View style={[styles.selectedContactRow, { backgroundColor: colors.primary + "15", borderColor: colors.primary + "40" }]}>
-                  <Feather name="user" size={14} color={colors.primary} />
-                  <Text style={[styles.selectedContactName, { color: colors.primary }]} numberOfLines={1}>
-                    {selectedContact.name}
-                  </Text>
-                  <Text style={[styles.selectedContactType, { color: colors.mutedForeground }]}>
-                    {t(`con_${selectedContact.type}` as any)}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => { setContactId(undefined); setContactPickerOpen(false); }}
-                    style={styles.clearContactBtn}
-                  >
-                    <Feather name="x" size={14} color={colors.mutedForeground} />
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  style={[styles.contactPickerBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
-                  onPress={() => setContactPickerOpen(o => !o)}
-                  testID="contact-picker-btn"
-                >
-                  <Feather name="user-plus" size={15} color={colors.mutedForeground} />
-                  <Text style={[styles.contactPickerBtnText, { color: colors.mutedForeground }]}>
-                    {t("mod_contactSearch")}
-                  </Text>
-                  <Feather name={contactPickerOpen ? "chevron-up" : "chevron-down"} size={15} color={colors.mutedForeground} />
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity
+                style={[styles.contactPickerBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
+                onPress={() => setContactPickerOpen(o => !o)}
+                testID="contact-picker-btn"
+              >
+                <Feather name="user-plus" size={16} color={colors.primary} />
+                <Text style={[styles.contactPickerBtnText, { color: colors.mutedForeground }]}>
+                  {t("mod_contactSearch")}
+                </Text>
+                <Feather name={contactPickerOpen ? "chevron-up" : "chevron-down"} size={15} color={colors.mutedForeground} />
+              </TouchableOpacity>
 
-              {/* Expanded contact list */}
-              {contactPickerOpen && !selectedContact && (
+              {contactPickerOpen && (
                 <View style={[styles.contactDropdown, { backgroundColor: colors.card, borderColor: colors.border }]}>
                   <View style={[styles.contactSearchRow, { borderBottomColor: colors.border }]}>
                     <Feather name="search" size={14} color={colors.mutedForeground} />
@@ -271,6 +248,31 @@ export default function AddTransactionModal({
               )}
             </>
           )}
+
+          {/* Date */}
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{t("mod_date")}</Text>
+          <View style={[styles.dateRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Feather name="calendar" size={16} color={colors.mutedForeground} />
+            <TextInput
+              style={[styles.dateInput, { color: colors.foreground }]}
+              placeholder="YYYY-MM-DD"
+              placeholderTextColor={colors.mutedForeground}
+              value={date}
+              onChangeText={setDate}
+              testID="date-input"
+            />
+          </View>
+
+          {/* Description */}
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{t("mod_description")}</Text>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
+            placeholder={t("mod_descriptionPlaceholder")}
+            placeholderTextColor={colors.mutedForeground}
+            value={description}
+            onChangeText={setDescription}
+            testID="description-input"
+          />
 
           {/* Payment method */}
           <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{t("mod_paymentMethod")}</Text>
