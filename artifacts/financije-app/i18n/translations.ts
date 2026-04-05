@@ -19,7 +19,7 @@ export const LANGUAGES: Language[] = [
 export type TranslationKeys = typeof en;
 
 const en = {
-  appName: "Business Finance",
+  appName: "MoFi",
   nav_home: "Home",
   nav_transactions: "Transactions",
   nav_reports: "Reports",
@@ -114,7 +114,7 @@ const en = {
 };
 
 const bs: TranslationKeys = {
-  appName: "Poslovne Financije",
+  appName: "MoFi",
   nav_home: "Početna",
   nav_transactions: "Transakcije",
   nav_reports: "Izvještaji",
@@ -209,7 +209,7 @@ const bs: TranslationKeys = {
 };
 
 const hr: TranslationKeys = {
-  appName: "Poslovne Financije",
+  appName: "MoFi",
   nav_home: "Početna",
   nav_transactions: "Transakcije",
   nav_reports: "Izvješća",
@@ -304,7 +304,7 @@ const hr: TranslationKeys = {
 };
 
 const sr: TranslationKeys = {
-  appName: "Poslovne Finansije",
+  appName: "MoFi",
   nav_home: "Početna",
   nav_transactions: "Transakcije",
   nav_reports: "Izveštaji",
@@ -399,7 +399,7 @@ const sr: TranslationKeys = {
 };
 
 const de: TranslationKeys = {
-  appName: "Unternehmensfinanzen",
+  appName: "MoFi",
   nav_home: "Startseite",
   nav_transactions: "Transaktionen",
   nav_reports: "Berichte",
@@ -494,7 +494,7 @@ const de: TranslationKeys = {
 };
 
 const fr: TranslationKeys = {
-  appName: "Finance d'Entreprise",
+  appName: "MoFi",
   nav_home: "Accueil",
   nav_transactions: "Transactions",
   nav_reports: "Rapports",

@@ -1,8 +1,13 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "PW4Ndki31qwJ3KpXz0ixF"
 uri = "file://artifacts/financije-app/assets/images/icon.png"
 type = "image"
 title = "finance app icon"
+
+[[outputs]]
+id = "WQ53_awZkbGjInMd1p13e"
+uri = "file://artifacts/financije-app/assets/images/icon.png"
+type = "image"
+title = "MoFi App Icon"
