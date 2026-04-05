@@ -12,6 +12,7 @@ export interface Transaction {
   category: string;
   description: string;
   date: string;
+  contactId?: string;
   createdAt: string;
 }
 
