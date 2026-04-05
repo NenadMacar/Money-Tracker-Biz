@@ -1,0 +1,47 @@
+Kratak opis: Potrebna mi je mobilna aplikacija (iOS i Android kompatibilna) razvijena na Replit platformi, namenjena malim biznis kompanijama. Glavna svrha aplikacije je jednostavno praćenje prihoda i rashoda, sa mogućnošću upravljanja bazom podataka o klijentima. Aplikacija treba da omogući korisnicima da unose transakcije, prate finansijsko stanje i generišu izveštaje na osnovu odabranog vremenskog perioda.
+
+Ključne funkcionalnosti:
+
+Praćenje prihoda i rashoda:
+
+Mogućnost lakog unosa novih prihoda (sa kategorizacijom, opisom, datumom, iznosom i povezanim klijentom).
+Mogućnost lakog unosa novih rashoda (sa kategorizacijom, opisom, datumom, iznosom i dobavljačem/projektom).
+Mogućnost pregleda svih unetih transakcija.
+Opcije za uređivanje i brisanje unetih prihoda i rashoda.
+Baze podataka:
+
+Baza podataka klijenata:
+Mogućnost dodavanja, pregleda, uređivanja i brisanja informacija o klijentima (ime, kontakt podaci, adresa, beleške).
+Povezivanje prihoda sa određenim klijentima.
+Baza podataka prihoda:
+Skladištenje svih unetih transakcija prihoda.
+Mogućnost dodavanja predefinisanih kategorija prihoda (npr. "Prodaja proizvoda", "Usluge", "Konsalting").
+Baza podataka rashoda:
+Skladištenje svih unetih transakcija rashoda.
+Mogućnost dodavanja predefinisanih kategorija rashoda (npr. "Najam", "Plate", "Marketing", "Kancelarijski materijal").
+Povezivanje sa kalendarom i izveštavanje:
+
+Integracija sa interaktivnim kalendarom unutar aplikacije.
+Mogućnost odabira proizvoljnog vremenskog perioda koristeći kalendar (npr. od 15. januara do 28. februara).
+Generisanje izveštaja za odabrani period koji uključuju:
+Ukupne prihode.
+Ukupne rashode.
+Neto profit (prihodi - rashodi).
+Brzi pregledi za fiksne periode: dnevni, sedmični, mesečni i kvartalni izveštaji.
+Grafički prikaz trendova prihoda, rashoda i profita (npr. jednostavni linijski ili stubičasti grafikoni).
+Korisnički interfejs (UI) i Korisničko iskustvo (UX):
+
+Čist, intuitivan i jednostavan dizajn prilagođen mobilnim uređajima.
+Brz pristup ključnim funkcijama.
+Pregledan prikaz finansijskih podataka.
+Dodatna razmatranja (opciono, ali poželjno):
+
+Autentifikacija korisnika: Jednostavan sistem za prijavu/registraciju.
+Bezbednost podataka: Osigurati bezbednost podataka klijenata i finansijskih informacija.
+Mogućnost izvoza podataka: Npr. u CSV ili PDF formatu za izveštaje.
+Tehnički zahtevi (Replit specifičnosti): Potrebno je iskoristiti Replit-ove mogućnosti za razvoj mobilnih aplikacija, uključujući Agent i AI-powered alate za bržu i efikasniju izradu, kao i Replit Workspace za razvojno okruženje 
+docs.replit.com
+. Aplikacija treba da bude kompatibilna sa iOS i Android operativnim sistemima 
+youtube.com
+.
+
