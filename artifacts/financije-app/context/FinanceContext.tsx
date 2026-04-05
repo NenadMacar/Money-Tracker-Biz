@@ -66,10 +66,16 @@ interface FinanceContextType {
   getTotalExpenses: () => number;
   getBalance: () => number;
   getTransactionsByMonth: (year: number, month: number) => Transaction[];
+  getTransactionsByDateRange: (from: string, to: string) => Transaction[];
   getCategoryTotals: (
     type: TransactionType,
     year: number,
     month: number
+  ) => { category: string; amount: number; icon: string }[];
+  getCategoryTotalsByRange: (
+    type: TransactionType,
+    from: string,
+    to: string
   ) => { category: string; amount: number; icon: string }[];
   getMonthlyTrends: () => { month: string; income: number; expenses: number }[];
 }
@@ -193,6 +199,27 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     });
   }
 
+  function getTransactionsByDateRange(from: string, to: string) {
+    const fromMs = new Date(from).setHours(0, 0, 0, 0);
+    const toMs   = new Date(to).setHours(23, 59, 59, 999);
+    return transactions.filter(t => {
+      const ms = new Date(t.date).getTime();
+      return ms >= fromMs && ms <= toMs;
+    });
+  }
+
+  function getCategoryTotalsByRange(type: TransactionType, from: string, to: string) {
+    const txs = getTransactionsByDateRange(from, to).filter(t => t.type === type);
+    const map = new Map<string, number>();
+    txs.forEach(t => { map.set(t.category, (map.get(t.category) || 0) + t.amount); });
+    return Array.from(map.entries())
+      .map(([category, amount]) => {
+        const cat = categories.find(c => c.name === category);
+        return { category, amount, icon: cat?.icon || "circle" };
+      })
+      .sort((a, b) => b.amount - a.amount);
+  }
+
   function getCategoryTotals(type: TransactionType, year: number, month: number) {
     const txs = getTransactionsByMonth(year, month).filter(t => t.type === type);
     const map = new Map<string, number>();
@@ -225,7 +252,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         transactions, categories, currency, setCurrency, formatAmount,
         addTransaction, deleteTransaction, addCategory, deleteCategory,
         getTotalIncome, getTotalExpenses, getBalance,
-        getTransactionsByMonth, getCategoryTotals, getMonthlyTrends,
+        getTransactionsByMonth, getTransactionsByDateRange,
+        getCategoryTotals, getCategoryTotalsByRange, getMonthlyTrends,
       }}
     >
       {children}
