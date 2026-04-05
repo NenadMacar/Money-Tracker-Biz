@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/"
+title = "Poslovne Financije"
+version = "1.0.0"
+id = "artifacts/financije-app"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/" ]
+localPort = 19354
+
+[services.development]
+run = "pnpm --filter @workspace/financije-app run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/financije-app", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/financije-app", "run", "serve" ]
+
+[services.env]
+PORT = "19354"
+BASE_PATH = "/"
