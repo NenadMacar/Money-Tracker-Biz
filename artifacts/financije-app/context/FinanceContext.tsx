@@ -106,7 +106,7 @@ const CURRENCY_KEY     = "@poslovne_financije_currency";
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories,   setCategories]   = useState<Category[]>(defaultCategories);
-  const [currency,     setCurrencyState] = useState<Currency>(CURRENCIES[0]);
+  const [currency,     setCurrencyState] = useState<Currency>(CURRENCIES.find(c => c.code === "EUR") ?? CURRENCIES[0]);
 
   useEffect(() => { loadData(); }, []);
 
