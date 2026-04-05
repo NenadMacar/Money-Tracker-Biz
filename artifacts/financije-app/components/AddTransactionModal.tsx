@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { PaymentMethod, TransactionType, useFinance } from "@/context/FinanceContext";
+import { useI18n } from "@/context/I18nContext";
 
 interface AddTransactionModalProps {
   visible: boolean;
@@ -29,6 +30,7 @@ export default function AddTransactionModal({
 }: AddTransactionModalProps) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useI18n();
   const { categories, addTransaction, currency } = useFinance();
 
   const [type,             setType]             = useState<TransactionType>(defaultType);
@@ -48,15 +50,15 @@ export default function AddTransactionModal({
 
   function handleSave() {
     if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
-      setError("Unesite ispravan iznos");
+      setError(t("mod_errorAmount"));
       return;
     }
     if (!selectedCategory) {
-      setError("Odaberite kategoriju");
+      setError(t("mod_errorCategory"));
       return;
     }
     if (!date) {
-      setError("Odaberite datum");
+      setError(t("mod_errorDate"));
       return;
     }
     setError("");
@@ -79,9 +81,9 @@ export default function AddTransactionModal({
           <TouchableOpacity onPress={resetAndClose} style={styles.closeBtn}>
             <Feather name="x" size={22} color={colors.foreground} />
           </TouchableOpacity>
-          <Text style={[styles.title, { color: colors.foreground }]}>Nova transakcija</Text>
+          <Text style={[styles.title, { color: colors.foreground }]}>{t("mod_title")}</Text>
           <TouchableOpacity onPress={handleSave} style={[styles.saveBtn, { backgroundColor: colors.primary }]}>
-            <Text style={[styles.saveBtnText, { color: colors.primaryForeground }]}>Sačuvaj</Text>
+            <Text style={[styles.saveBtnText, { color: colors.primaryForeground }]}>{t("mod_save")}</Text>
           </TouchableOpacity>
         </View>
 
@@ -89,7 +91,6 @@ export default function AddTransactionModal({
           contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Income / Expense toggle */}
           <View style={[styles.typeToggle, { backgroundColor: colors.muted }]}>
             <Pressable
               style={[styles.typeBtn, type === "income" && { backgroundColor: colors.income }]}
@@ -97,7 +98,7 @@ export default function AddTransactionModal({
             >
               <Feather name="trending-up" size={16} color={type === "income" ? "#fff" : colors.mutedForeground} />
               <Text style={[styles.typeBtnText, { color: type === "income" ? "#fff" : colors.mutedForeground }]}>
-                Prihod
+                {t("mod_income")}
               </Text>
             </Pressable>
             <Pressable
@@ -106,12 +107,11 @@ export default function AddTransactionModal({
             >
               <Feather name="trending-down" size={16} color={type === "expense" ? "#fff" : colors.mutedForeground} />
               <Text style={[styles.typeBtnText, { color: type === "expense" ? "#fff" : colors.mutedForeground }]}>
-                Rashod
+                {t("mod_expense")}
               </Text>
             </Pressable>
           </View>
 
-          {/* Amount */}
           <View style={[styles.amountContainer, { borderBottomColor: colors.border }]}>
             <Text style={[styles.currencySymbol, { color: colors.mutedForeground }]}>
               {currency.symbol}
@@ -127,39 +127,31 @@ export default function AddTransactionModal({
             />
           </View>
 
-          {/* Payment method */}
-          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>NAČIN PLAĆANJA</Text>
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{t("mod_paymentMethod")}</Text>
           <View style={[styles.paymentToggle, { backgroundColor: colors.muted }]}>
             <Pressable
-              style={[
-                styles.paymentBtn,
-                paymentMethod === "bank" && { backgroundColor: colors.primary },
-              ]}
+              style={[styles.paymentBtn, paymentMethod === "bank" && { backgroundColor: colors.primary }]}
               onPress={() => setPaymentMethod("bank")}
               testID="payment-bank"
             >
               <Feather name="credit-card" size={15} color={paymentMethod === "bank" ? "#fff" : colors.mutedForeground} />
               <Text style={[styles.paymentBtnText, { color: paymentMethod === "bank" ? "#fff" : colors.mutedForeground }]}>
-                Tekući račun
+                {t("mod_bank")}
               </Text>
             </Pressable>
             <Pressable
-              style={[
-                styles.paymentBtn,
-                paymentMethod === "cash" && { backgroundColor: "#854d0e" },
-              ]}
+              style={[styles.paymentBtn, paymentMethod === "cash" && { backgroundColor: "#854d0e" }]}
               onPress={() => setPaymentMethod("cash")}
               testID="payment-cash"
             >
               <Feather name="dollar-sign" size={15} color={paymentMethod === "cash" ? "#fff" : colors.mutedForeground} />
               <Text style={[styles.paymentBtnText, { color: paymentMethod === "cash" ? "#fff" : colors.mutedForeground }]}>
-                Gotovina
+                {t("mod_cash")}
               </Text>
             </Pressable>
           </View>
 
-          {/* Date */}
-          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>DATUM</Text>
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{t("mod_date")}</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
             placeholder="YYYY-MM-DD"
@@ -169,19 +161,17 @@ export default function AddTransactionModal({
             testID="date-input"
           />
 
-          {/* Description */}
-          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>OPIS (opcionalno)</Text>
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{t("mod_description")}</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
-            placeholder="Dodaj opis..."
+            placeholder={t("mod_descriptionPlaceholder")}
             placeholderTextColor={colors.mutedForeground}
             value={description}
             onChangeText={setDescription}
             testID="description-input"
           />
 
-          {/* Category */}
-          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>KATEGORIJA</Text>
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{t("mod_category")}</Text>
           <View style={styles.categoriesGrid}>
             {filteredCats.map(cat => (
               <Pressable
@@ -205,21 +195,12 @@ export default function AddTransactionModal({
                 <Feather
                   name={cat.icon as any}
                   size={14}
-                  color={
-                    selectedCategory === cat.name
-                      ? type === "income" ? colors.income : colors.expense
-                      : colors.mutedForeground
-                  }
+                  color={selectedCategory === cat.name ? (type === "income" ? colors.income : colors.expense) : colors.mutedForeground}
                 />
                 <Text
                   style={[
                     styles.catChipText,
-                    {
-                      color:
-                        selectedCategory === cat.name
-                          ? type === "income" ? colors.income : colors.expense
-                          : colors.foreground,
-                    },
+                    { color: selectedCategory === cat.name ? (type === "income" ? colors.income : colors.expense) : colors.foreground },
                   ]}
                 >
                   {cat.name}

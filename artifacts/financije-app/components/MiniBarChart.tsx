@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { useI18n } from "@/context/I18nContext";
 
 interface BarData {
   month: string;
@@ -14,6 +15,7 @@ interface MiniBarChartProps {
 
 export default function MiniBarChart({ data }: MiniBarChartProps) {
   const colors = useColors();
+  const { t } = useI18n();
   const maxVal = Math.max(...data.map((d) => Math.max(d.income, d.expenses)), 1);
 
   return (
@@ -52,11 +54,11 @@ export default function MiniBarChart({ data }: MiniBarChartProps) {
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.income }]} />
-          <Text style={[styles.legendText, { color: colors.mutedForeground }]}>Prihodi</Text>
+          <Text style={[styles.legendText, { color: colors.mutedForeground }]}>{t("rep_income")}</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.expense }]} />
-          <Text style={[styles.legendText, { color: colors.mutedForeground }]}>Rashodi</Text>
+          <Text style={[styles.legendText, { color: colors.mutedForeground }]}>{t("rep_expenses")}</Text>
         </View>
       </View>
     </View>

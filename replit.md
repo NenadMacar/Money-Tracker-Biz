@@ -37,18 +37,28 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 
 #### Features
 - Dashboard with balance card, income/expense summary, monthly trend bar chart
-- Transaction management (add/delete income & expenses)
-- Reports screen with monthly navigation, category breakdown, net balance
-- Settings screen for category management
-- Supports Bosnian language UI (KM currency)
+- Transaction management (add/delete income & expenses) with payment method tracking (bank/cash)
+- Reports: monthly navigation + custom date-range with quick shortcuts; income/expenses/profit/loss; payment method filter; category breakdown charts
+- Settings: language switcher, currency picker (22 currencies), category management (add/delete)
+- Full i18n: English (default), Bosnian, Croatian, Serbian, German, French
+- Default currency: KM/BAM; 22 currencies supported
+
+#### i18n System
+- `i18n/translations.ts` — all string keys for 6 languages (`LangCode`, `LANGUAGES`, `TRANSLATIONS`)
+- `context/I18nContext.tsx` — `I18nProvider`, `useI18n()` → `{ t, tf, language, locale, setLanguage, languages }`
+- Language stored in AsyncStorage key `@pf_language`; locale string used with `Intl` APIs
+- `tf(key, ...args)` supports `%s` substitution for dynamic strings
 
 #### Key Files
-- `context/FinanceContext.tsx` — main app state (transactions, categories, totals)
+- `context/FinanceContext.tsx` — main app state (transactions, categories, currency; default categories in English)
+- `context/I18nContext.tsx` — i18n context with language persistence
+- `i18n/translations.ts` — all translations for 6 languages
+- `app/_layout.tsx` — root layout; wraps with `I18nProvider` → `FinanceProvider`
 - `app/(tabs)/index.tsx` — dashboard
 - `app/(tabs)/transactions.tsx` — transaction list with filters
-- `app/(tabs)/reports.tsx` — analytics and reports
-- `app/(tabs)/settings.tsx` — category management
-- `components/TransactionCard.tsx` — individual transaction row
+- `app/(tabs)/reports.tsx` — analytics and reports (monthly + date-range modes)
+- `app/(tabs)/settings.tsx` — language, currency, and category management
+- `components/TransactionCard.tsx` — individual transaction row with payment badge
 - `components/AddTransactionModal.tsx` — add transaction form
 - `components/MiniBarChart.tsx` — 6-month trend bar chart
 - `components/DonutChart.tsx` — category breakdown chart

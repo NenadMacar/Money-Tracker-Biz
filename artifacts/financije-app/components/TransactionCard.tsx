@@ -4,18 +4,15 @@ import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useColors } from "@/hooks/useColors";
 import { Transaction, useFinance } from "@/context/FinanceContext";
+import { useI18n } from "@/context/I18nContext";
 
 interface TransactionCardProps {
   transaction: Transaction;
 }
 
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("bs-BA", { day: "2-digit", month: "2-digit", year: "numeric" });
-}
-
 export default function TransactionCard({ transaction }: TransactionCardProps) {
   const colors = useColors();
+  const { t, locale } = useI18n();
   const { deleteTransaction, categories, formatAmount } = useFinance();
   const isIncome = transaction.type === "income";
   const isBank   = (transaction.paymentMethod ?? "bank") === "bank";
@@ -23,22 +20,22 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
   const cat  = categories.find(c => c.name === transaction.category);
   const icon = (cat?.icon || "circle") as any;
 
+  function formatDate(dateStr: string): string {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString(locale, { day: "2-digit", month: "2-digit", year: "numeric" });
+  }
+
   function handleDelete() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert("Obriši transakciju", "Jesi li siguran?", [
-      { text: "Odustani", style: "cancel" },
-      { text: "Obriši", style: "destructive", onPress: () => deleteTransaction(transaction.id) },
+    Alert.alert(t("card_delete"), t("card_deleteConfirm"), [
+      { text: t("card_cancel"), style: "cancel" },
+      { text: t("set_delete"), style: "destructive", onPress: () => deleteTransaction(transaction.id) },
     ]);
   }
 
   return (
     <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <View
-        style={[
-          styles.iconContainer,
-          { backgroundColor: isIncome ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)" },
-        ]}
-      >
+      <View style={[styles.iconContainer, { backgroundColor: isIncome ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)" }]}>
         <Feather name={icon} size={18} color={isIncome ? colors.income : colors.expense} />
       </View>
 
@@ -62,13 +59,9 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
               borderColor:     isBank ? "rgba(59,130,246,0.3)"  : "rgba(133,77,14,0.3)",
             },
           ]}>
-            <Feather
-              name={isBank ? "credit-card" : "dollar-sign"}
-              size={10}
-              color={isBank ? "#3b82f6" : "#854d0e"}
-            />
+            <Feather name={isBank ? "credit-card" : "dollar-sign"} size={10} color={isBank ? "#3b82f6" : "#854d0e"} />
             <Text style={[styles.paymentBadgeText, { color: isBank ? "#3b82f6" : "#854d0e" }]}>
-              {isBank ? "Račun" : "Gotovina"}
+              {isBank ? t("card_bank") : t("card_cash")}
             </Text>
           </View>
         </View>
@@ -100,7 +93,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  iconContainer:    { width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center", marginRight: 12, backgroundColor: "transparent" },
+  iconContainer:    { width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center", marginRight: 12 },
   info:             { flex: 1, gap: 2 },
   category:         { fontSize: 15, fontFamily: "Inter_600SemiBold" },
   description:      { fontSize: 13, fontFamily: "Inter_400Regular" },

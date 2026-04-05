@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useFinance } from "@/context/FinanceContext";
+import { useI18n } from "@/context/I18nContext";
 import TransactionCard from "@/components/TransactionCard";
 import AddTransactionModal from "@/components/AddTransactionModal";
 import MiniBarChart from "@/components/MiniBarChart";
@@ -19,6 +20,7 @@ import MiniBarChart from "@/components/MiniBarChart";
 export default function DashboardScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useI18n();
   const { getTotalIncome, getTotalExpenses, getBalance, transactions, getMonthlyTrends, formatAmount } = useFinance();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<"income" | "expense">("expense");
@@ -46,24 +48,24 @@ export default function DashboardScreen() {
           { paddingTop: topPad + 16, paddingBottom: (Platform.OS === "web" ? 34 : insets.bottom) + 100 },
         ]}
       >
-        <Text style={[styles.greeting,     { color: colors.mutedForeground }]}>Dobrodošli</Text>
-        <Text style={[styles.companyLabel, { color: colors.foreground }]}>Poslovne Financije</Text>
+        <Text style={[styles.greeting,     { color: colors.mutedForeground }]}>{t("dash_welcome")}</Text>
+        <Text style={[styles.companyLabel, { color: colors.foreground }]}>{t("appName")}</Text>
 
         <View style={[styles.balanceCard, { backgroundColor: colors.primary }]}>
-          <Text style={styles.balanceLabel}>Ukupni saldo</Text>
+          <Text style={styles.balanceLabel}>{t("dash_totalBalance")}</Text>
           <Text style={[styles.balanceAmount, { color: balance < 0 ? "#fca5a5" : "#ffffff" }]}>
             {formatAmount(balance)}
           </Text>
           <View style={styles.balanceRow}>
             <View style={styles.balanceStat}>
               <Feather name="trending-up" size={14} color="rgba(255,255,255,0.7)" />
-              <Text style={styles.balanceStatLabel}>Prihodi</Text>
+              <Text style={styles.balanceStatLabel}>{t("dash_income")}</Text>
               <Text style={styles.balanceStatValue}>{formatAmount(income)}</Text>
             </View>
             <View style={styles.balanceDivider} />
             <View style={styles.balanceStat}>
               <Feather name="trending-down" size={14} color="rgba(255,255,255,0.7)" />
-              <Text style={styles.balanceStatLabel}>Rashodi</Text>
+              <Text style={styles.balanceStatLabel}>{t("dash_expenses")}</Text>
               <Text style={styles.balanceStatValue}>{formatAmount(expenses)}</Text>
             </View>
           </View>
@@ -76,7 +78,7 @@ export default function DashboardScreen() {
             testID="add-income-btn"
           >
             <Feather name="plus" size={18} color={colors.income} />
-            <Text style={[styles.actionBtnText, { color: colors.income }]}>Dodaj prihod</Text>
+            <Text style={[styles.actionBtnText, { color: colors.income }]}>{t("dash_addIncome")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionBtn, { backgroundColor: "rgba(239,68,68,0.12)", borderColor: colors.expense }]}
@@ -84,24 +86,24 @@ export default function DashboardScreen() {
             testID="add-expense-btn"
           >
             <Feather name="minus" size={18} color={colors.expense} />
-            <Text style={[styles.actionBtnText, { color: colors.expense }]}>Dodaj rashod</Text>
+            <Text style={[styles.actionBtnText, { color: colors.expense }]}>{t("dash_addExpense")}</Text>
           </TouchableOpacity>
         </View>
 
         <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Trendovi — zadnjih 6 mj.</Text>
+          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>{t("dash_trends")}</Text>
           <MiniBarChart data={trends} />
         </View>
 
         <View style={styles.recentHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Nedavne transakcije</Text>
+          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>{t("dash_recentTx")}</Text>
         </View>
 
         {recentTx.length === 0 ? (
           <View style={[styles.emptyState, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Feather name="inbox" size={32} color={colors.mutedForeground} />
             <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-              Nema transakcija. Dodajte prvu!
+              {t("dash_noTx")}
             </Text>
           </View>
         ) : (

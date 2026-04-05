@@ -13,23 +13,13 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { PaymentMethod, Transaction, useFinance } from "@/context/FinanceContext";
+import { useI18n } from "@/context/I18nContext";
 import DonutChart from "@/components/DonutChart";
 import MiniBarChart from "@/components/MiniBarChart";
 
-const MONTHS = [
-  "Januar", "Februar", "Mart", "April", "Maj", "Juni",
-  "Juli", "August", "Septembar", "Oktobar", "Novembar", "Decembar",
-];
-
-type Mode    = "monthly" | "range";
-type CatTab  = "income"  | "expense";
+type Mode     = "monthly" | "range";
+type CatTab   = "income"  | "expense";
 type PmFilter = "all" | "bank" | "cash";
-
-const PM_OPTIONS: { key: PmFilter; label: string; icon: string }[] = [
-  { key: "all",  label: "Sve",          icon: "layers"      },
-  { key: "bank", label: "Tekući račun", icon: "credit-card" },
-  { key: "cash", label: "Gotovina",     icon: "dollar-sign" },
-];
 
 function applyPmFilter(txs: Transaction[], pm: PmFilter) {
   if (pm === "all") return txs;
@@ -42,29 +32,28 @@ function calcTotals(txs: Transaction[]) {
   return { income, expense, net: income - expense };
 }
 
-function todayStr()        { return new Date().toISOString().split("T")[0]; }
-function startOfWeekStr()  { const d = new Date(); const day = d.getDay(); d.setDate(d.getDate() - day + (day === 0 ? -6 : 1)); return d.toISOString().split("T")[0]; }
-function startOfMonthStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`; }
+function todayStr()         { return new Date().toISOString().split("T")[0]; }
+function startOfWeekStr()   { const d = new Date(); const day = d.getDay(); d.setDate(d.getDate() - day + (day === 0 ? -6 : 1)); return d.toISOString().split("T")[0]; }
+function startOfMonthStr()  { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`; }
 function startOfQuarterStr(){ const d = new Date(); const q = Math.floor(d.getMonth() / 3); return `${d.getFullYear()}-${String(q * 3 + 1).padStart(2, "0")}-01`; }
 function isValidDate(s: string) { if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false; return !isNaN(new Date(s).getTime()); }
-function fmtDisplay(s: string) { if (!isValidDate(s)) return s; return new Date(s).toLocaleDateString("bs-BA", { day: "2-digit", month: "2-digit", year: "numeric" }); }
 
 export default function ReportsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t, locale } = useI18n();
   const {
-    getCategoryTotals, getCategoryTotalsByRange,
     getTransactionsByMonth, getTransactionsByDateRange,
     getMonthlyTrends, formatAmount, categories,
   } = useFinance();
 
   const now = new Date();
 
-  const [mode,    setMode]    = useState<Mode>("monthly");
-  const [year,    setYear]    = useState(now.getFullYear());
-  const [month,   setMonth]   = useState(now.getMonth());
-  const [catTab,  setCatTab]  = useState<CatTab>("income");
-  const [pmFilter,setPmFilter]= useState<PmFilter>("all");
+  const [mode,     setMode]     = useState<Mode>("monthly");
+  const [year,     setYear]     = useState(now.getFullYear());
+  const [month,    setMonth]    = useState(now.getMonth());
+  const [catTab,   setCatTab]   = useState<CatTab>("income");
+  const [pmFilter, setPmFilter] = useState<PmFilter>("all");
 
   const [fromDate, setFromDate] = useState(startOfMonthStr());
   const [toDate,   setToDate]   = useState(todayStr());
@@ -74,7 +63,16 @@ export default function ReportsScreen() {
 
   const trends = getMonthlyTrends();
 
-  // ── Monthly ────────────────────────────────────────────────
+  function fmtDisplay(s: string) {
+    if (!isValidDate(s)) return s;
+    return new Date(s).toLocaleDateString(locale, { day: "2-digit", month: "2-digit", year: "numeric" });
+  }
+
+  function monthYearLabel() {
+    return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date(year, month));
+  }
+
+  // Monthly
   const monthTxsAll = getTransactionsByMonth(year, month);
   const monthTxs    = applyPmFilter(monthTxsAll, pmFilter);
   const { income: monthIncome, expense: monthExpense, net: monthNet } = calcTotals(monthTxs);
@@ -92,7 +90,7 @@ export default function ReportsScreen() {
   function prevMonth() { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); }
   function nextMonth() { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); }
 
-  // ── Range ──────────────────────────────────────────────────
+  // Range
   const rangeValid = isValidDate(fromDate) && isValidDate(toDate) && fromDate <= toDate;
 
   const rangeTxsAll = useMemo(() => {
@@ -115,36 +113,29 @@ export default function ReportsScreen() {
   }, [rangeTxs, catTabR, categories]);
 
   function applyQuick(from: string, to: string) {
-    setFromDate(from); setFromRaw(from);
-    setToDate(to);     setToRaw(to);
+    setFromDate(from); setFromRaw(from); setToDate(to); setToRaw(to);
   }
   function handleFromChange(v: string) { setFromRaw(v); if (isValidDate(v)) setFromDate(v); }
   function handleToChange(v: string)   { setToRaw(v);   if (isValidDate(v)) setToDate(v); }
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
-  // ── Payment filter bar ─────────────────────────────────────
+  const pmOptions: { key: PmFilter; label: string; icon: string }[] = [
+    { key: "all",  label: t("rep_all"),  icon: "layers"      },
+    { key: "bank", label: t("rep_bank"), icon: "credit-card" },
+    { key: "cash", label: t("rep_cash"), icon: "dollar-sign" },
+  ];
+
   function PmFilterBar() {
     return (
       <View style={[styles.pmBar, { backgroundColor: colors.muted }]}>
-        {PM_OPTIONS.map(opt => {
+        {pmOptions.map(opt => {
           const active = pmFilter === opt.key;
-          const bg = active
-            ? opt.key === "bank" ? "#1d4ed8"
-            : opt.key === "cash" ? "#854d0e"
-            : colors.primary
-            : "transparent";
+          const bg = active ? (opt.key === "bank" ? "#1d4ed8" : opt.key === "cash" ? "#854d0e" : colors.primary) : "transparent";
           return (
-            <Pressable
-              key={opt.key}
-              style={[styles.pmBtn, active && { backgroundColor: bg }]}
-              onPress={() => setPmFilter(opt.key)}
-              testID={`pm-filter-${opt.key}`}
-            >
+            <Pressable key={opt.key} style={[styles.pmBtn, active && { backgroundColor: bg }]} onPress={() => setPmFilter(opt.key)}>
               <Feather name={opt.icon as any} size={12} color={active ? "#fff" : colors.mutedForeground} />
-              <Text style={[styles.pmBtnText, { color: active ? "#fff" : colors.mutedForeground }]}>
-                {opt.label}
-              </Text>
+              <Text style={[styles.pmBtnText, { color: active ? "#fff" : colors.mutedForeground }]}>{opt.label}</Text>
             </Pressable>
           );
         })}
@@ -152,31 +143,30 @@ export default function ReportsScreen() {
     );
   }
 
-  // ── Summary cards ──────────────────────────────────────────
   function SummaryCards({ income, expense }: { income: number; expense: number }) {
     return (
       <View style={styles.summaryRow}>
         <View style={[styles.summaryCard, { backgroundColor: "rgba(34,197,94,0.1)", borderColor: "rgba(34,197,94,0.3)" }]}>
           <Feather name="trending-up" size={15} color={colors.income} />
-          <Text style={[styles.summaryLabel, { color: colors.income }]}>Prihodi</Text>
+          <Text style={[styles.summaryLabel, { color: colors.income }]}>{t("rep_income")}</Text>
           <Text style={[styles.summaryAmount, { color: colors.income }]}>{formatAmount(income)}</Text>
         </View>
         <View style={[styles.summaryCard, { backgroundColor: "rgba(239,68,68,0.1)", borderColor: "rgba(239,68,68,0.3)" }]}>
           <Feather name="trending-down" size={15} color={colors.expense} />
-          <Text style={[styles.summaryLabel, { color: colors.expense }]}>Rashodi</Text>
+          <Text style={[styles.summaryLabel, { color: colors.expense }]}>{t("rep_expenses")}</Text>
           <Text style={[styles.summaryAmount, { color: colors.expense }]}>{formatAmount(expense)}</Text>
         </View>
       </View>
     );
   }
 
-  function NetCard({ net, label }: { net: number; label?: string }) {
+  function NetCard({ net }: { net: number }) {
     const pos = net >= 0;
     return (
       <View style={[styles.netCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <View style={styles.netLeft}>
           <Feather name={pos ? "arrow-up-circle" : "arrow-down-circle"} size={20} color={pos ? colors.income : colors.expense} />
-          <Text style={[styles.netLabel, { color: colors.mutedForeground }]}>{label ?? (pos ? "Profit" : "Gubitak")}</Text>
+          <Text style={[styles.netLabel, { color: colors.mutedForeground }]}>{pos ? t("rep_profitLabel") : t("rep_lossLabel")}</Text>
         </View>
         <Text style={[styles.netAmount, { color: pos ? colors.income : colors.expense }]}>
           {pos ? "+" : ""}{formatAmount(net)}
@@ -194,21 +184,19 @@ export default function ReportsScreen() {
           { paddingTop: topPad + 16, paddingBottom: (Platform.OS === "web" ? 34 : insets.bottom) + 100 },
         ]}
       >
-        <Text style={[styles.title, { color: colors.foreground }]}>Izvještaji</Text>
+        <Text style={[styles.title, { color: colors.foreground }]}>{t("rep_title")}</Text>
 
-        {/* ── Mode Toggle ── */}
         <View style={[styles.modeToggle, { backgroundColor: colors.muted }]}>
           <Pressable style={[styles.modeBtn, mode === "monthly" && { backgroundColor: colors.primary }]} onPress={() => setMode("monthly")}>
             <Feather name="calendar" size={14} color={mode === "monthly" ? "#fff" : colors.mutedForeground} />
-            <Text style={[styles.modeBtnText, { color: mode === "monthly" ? "#fff" : colors.mutedForeground }]}>Mesečno</Text>
+            <Text style={[styles.modeBtnText, { color: mode === "monthly" ? "#fff" : colors.mutedForeground }]}>{t("rep_monthly")}</Text>
           </Pressable>
           <Pressable style={[styles.modeBtn, mode === "range" && { backgroundColor: colors.primary }]} onPress={() => setMode("range")}>
             <Feather name="sliders" size={14} color={mode === "range" ? "#fff" : colors.mutedForeground} />
-            <Text style={[styles.modeBtnText, { color: mode === "range" ? "#fff" : colors.mutedForeground }]}>Po periodu</Text>
+            <Text style={[styles.modeBtnText, { color: mode === "range" ? "#fff" : colors.mutedForeground }]}>{t("rep_byPeriod")}</Text>
           </Pressable>
         </View>
 
-        {/* ── Payment Method Filter ── */}
         <PmFilterBar />
 
         {pmFilter !== "all" && (
@@ -216,48 +204,41 @@ export default function ReportsScreen() {
             backgroundColor: pmFilter === "bank" ? "rgba(29,78,216,0.1)" : "rgba(133,77,14,0.1)",
             borderColor:     pmFilter === "bank" ? "rgba(29,78,216,0.3)" : "rgba(133,77,14,0.3)",
           }]}>
-            <Feather
-              name={pmFilter === "bank" ? "credit-card" : "dollar-sign"}
-              size={13}
-              color={pmFilter === "bank" ? "#1d4ed8" : "#854d0e"}
-            />
+            <Feather name={pmFilter === "bank" ? "credit-card" : "dollar-sign"} size={13} color={pmFilter === "bank" ? "#1d4ed8" : "#854d0e"} />
             <Text style={[styles.pmActiveBannerText, { color: pmFilter === "bank" ? "#1d4ed8" : "#854d0e" }]}>
-              Prikazani samo: {pmFilter === "bank" ? "Tekući račun" : "Gotovina"}
+              {t("rep_shownOnly")} {pmFilter === "bank" ? t("rep_bank") : t("rep_cash")}
             </Text>
           </View>
         )}
 
-        {/* ════════════ MONTHLY MODE ════════════ */}
+        {/* ════ MONTHLY ════ */}
         {mode === "monthly" && (
           <>
             <View style={[styles.monthNav, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <TouchableOpacity onPress={prevMonth} style={styles.navArrow} testID="prev-month">
                 <Feather name="chevron-left" size={22} color={colors.foreground} />
               </TouchableOpacity>
-              <Text style={[styles.monthLabel, { color: colors.foreground }]}>{MONTHS[month]} {year}</Text>
+              <Text style={[styles.monthLabel, { color: colors.foreground }]}>{monthYearLabel()}</Text>
               <TouchableOpacity onPress={nextMonth} style={styles.navArrow} testID="next-month">
                 <Feather name="chevron-right" size={22} color={colors.foreground} />
               </TouchableOpacity>
             </View>
-
             <SummaryCards income={monthIncome} expense={monthExpense} />
             <NetCard net={monthNet} />
-
             {pmFilter === "all" && (
               <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Trendovi — zadnjih 6 mj.</Text>
+                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>{t("rep_trends")}</Text>
                 <MiniBarChart data={trends} />
               </View>
             )}
-
             <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Po kategorijama</Text>
+              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>{t("rep_byCategory")}</Text>
               <View style={[styles.tabRow, { backgroundColor: colors.muted }]}>
                 <Pressable style={[styles.tabBtn, catTab === "income" && { backgroundColor: colors.income }]} onPress={() => setCatTab("income")}>
-                  <Text style={[styles.tabText, { color: catTab === "income" ? "#fff" : colors.mutedForeground }]}>Prihodi</Text>
+                  <Text style={[styles.tabText, { color: catTab === "income" ? "#fff" : colors.mutedForeground }]}>{t("rep_income")}</Text>
                 </Pressable>
                 <Pressable style={[styles.tabBtn, catTab === "expense" && { backgroundColor: colors.expense }]} onPress={() => setCatTab("expense")}>
-                  <Text style={[styles.tabText, { color: catTab === "expense" ? "#fff" : colors.mutedForeground }]}>Rashodi</Text>
+                  <Text style={[styles.tabText, { color: catTab === "expense" ? "#fff" : colors.mutedForeground }]}>{t("rep_expenses")}</Text>
                 </Pressable>
               </View>
               <DonutChart data={monthCatTotals} type={catTab} />
@@ -265,15 +246,15 @@ export default function ReportsScreen() {
           </>
         )}
 
-        {/* ════════════ RANGE MODE ════════════ */}
+        {/* ════ RANGE ════ */}
         {mode === "range" && (
           <>
             <View style={styles.quickRow}>
               {[
-                { label: "Danas",     from: todayStr(),         to: todayStr()   },
-                { label: "Ova sed.",  from: startOfWeekStr(),   to: todayStr()   },
-                { label: "Ovaj mj.", from: startOfMonthStr(),  to: todayStr()   },
-                { label: "Kvartal",  from: startOfQuarterStr(),to: todayStr()   },
+                { label: t("rep_today"),     from: todayStr(),         to: todayStr()    },
+                { label: t("rep_thisWeek"),  from: startOfWeekStr(),   to: todayStr()    },
+                { label: t("rep_thisMonth"), from: startOfMonthStr(),  to: todayStr()    },
+                { label: t("rep_quarter"),   from: startOfQuarterStr(),to: todayStr()    },
               ].map(q => (
                 <Pressable
                   key={q.label}
@@ -286,22 +267,22 @@ export default function ReportsScreen() {
             </View>
 
             <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Odaberi period</Text>
+              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>{t("rep_selectPeriod")}</Text>
               <View style={styles.dateRow}>
                 <View style={styles.dateField}>
-                  <Text style={[styles.dateFieldLabel, { color: colors.mutedForeground }]}>OD</Text>
+                  <Text style={[styles.dateFieldLabel, { color: colors.mutedForeground }]}>{t("rep_from")}</Text>
                   <TextInput style={[styles.dateInput, { backgroundColor: colors.background, borderColor: isValidDate(fromRaw) ? colors.primary : colors.destructive, color: colors.foreground }]} value={fromRaw} onChangeText={handleFromChange} placeholder="YYYY-MM-DD" placeholderTextColor={colors.mutedForeground} testID="from-date-input" />
                   {isValidDate(fromRaw) && <Text style={[styles.dateParsed, { color: colors.mutedForeground }]}>{fmtDisplay(fromRaw)}</Text>}
                 </View>
                 <View style={[styles.dateSeparator, { backgroundColor: colors.border }]} />
                 <View style={styles.dateField}>
-                  <Text style={[styles.dateFieldLabel, { color: colors.mutedForeground }]}>DO</Text>
+                  <Text style={[styles.dateFieldLabel, { color: colors.mutedForeground }]}>{t("rep_to")}</Text>
                   <TextInput style={[styles.dateInput, { backgroundColor: colors.background, borderColor: isValidDate(toRaw) ? colors.primary : colors.destructive, color: colors.foreground }]} value={toRaw} onChangeText={handleToChange} placeholder="YYYY-MM-DD" placeholderTextColor={colors.mutedForeground} testID="to-date-input" />
                   {isValidDate(toRaw) && <Text style={[styles.dateParsed, { color: colors.mutedForeground }]}>{fmtDisplay(toRaw)}</Text>}
                 </View>
               </View>
               {isValidDate(fromRaw) && isValidDate(toRaw) && fromDate > toDate && (
-                <Text style={[styles.dateError, { color: colors.destructive }]}>Datum "od" mora biti prije datuma "do"</Text>
+                <Text style={[styles.dateError, { color: colors.destructive }]}>{t("rep_dateError")}</Text>
               )}
             </View>
 
@@ -310,28 +291,22 @@ export default function ReportsScreen() {
                 <View style={[styles.periodLabel, { backgroundColor: colors.accent, borderColor: colors.border }]}>
                   <Feather name="calendar" size={14} color={colors.primary} />
                   <Text style={[styles.periodLabelText, { color: colors.primary }]}>
-                    {fmtDisplay(fromDate)} — {fmtDisplay(toDate)} · {rangeTxs.length} transakcija
+                    {fmtDisplay(fromDate)} — {fmtDisplay(toDate)} · {rangeTxs.length} {t("rep_transactions")}
                   </Text>
                 </View>
 
                 <SummaryCards income={rangeIncome} expense={rangeExpense} />
 
-                <View style={[
-                  styles.profitCard,
-                  {
-                    backgroundColor: isProfit ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)",
-                    borderColor:     isProfit ? "rgba(34,197,94,0.4)"  : "rgba(239,68,68,0.4)",
-                  },
-                ]}>
+                <View style={[styles.profitCard, { backgroundColor: isProfit ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)", borderColor: isProfit ? "rgba(34,197,94,0.4)" : "rgba(239,68,68,0.4)" }]}>
                   <View style={styles.profitLeft}>
                     <View style={[styles.profitIconBg, { backgroundColor: isProfit ? colors.income : colors.expense }]}>
                       <Feather name={isProfit ? "arrow-up" : "arrow-down"} size={18} color="#fff" />
                     </View>
                     <View>
                       <Text style={[styles.profitTitle, { color: isProfit ? colors.income : colors.expense }]}>
-                        {isProfit ? "PROFIT" : "GUBITAK"}
+                        {isProfit ? t("rep_profit") : t("rep_loss")}
                       </Text>
-                      <Text style={[styles.profitSub, { color: colors.mutedForeground }]}>Prihodi − Rashodi</Text>
+                      <Text style={[styles.profitSub, { color: colors.mutedForeground }]}>{t("rep_incomeMinusExpenses")}</Text>
                     </View>
                   </View>
                   <Text style={[styles.profitAmount, { color: isProfit ? colors.income : colors.expense }]}>
@@ -341,7 +316,7 @@ export default function ReportsScreen() {
 
                 {rangeIncome > 0 && (
                   <View style={[styles.marginCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    <Text style={[styles.marginLabel, { color: colors.mutedForeground }]}>Profitna marža</Text>
+                    <Text style={[styles.marginLabel, { color: colors.mutedForeground }]}>{t("rep_margin")}</Text>
                     <Text style={[styles.marginValue, { color: isProfit ? colors.income : colors.expense }]}>
                       {((rangeNet / rangeIncome) * 100).toFixed(1)}%
                     </Text>
@@ -349,13 +324,13 @@ export default function ReportsScreen() {
                 )}
 
                 <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                  <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Po kategorijama</Text>
+                  <Text style={[styles.sectionTitle, { color: colors.foreground }]}>{t("rep_byCategory")}</Text>
                   <View style={[styles.tabRow, { backgroundColor: colors.muted }]}>
                     <Pressable style={[styles.tabBtn, catTabR === "income" && { backgroundColor: colors.income }]} onPress={() => setCatTabR("income")}>
-                      <Text style={[styles.tabText, { color: catTabR === "income" ? "#fff" : colors.mutedForeground }]}>Prihodi</Text>
+                      <Text style={[styles.tabText, { color: catTabR === "income" ? "#fff" : colors.mutedForeground }]}>{t("rep_income")}</Text>
                     </Pressable>
                     <Pressable style={[styles.tabBtn, catTabR === "expense" && { backgroundColor: colors.expense }]} onPress={() => setCatTabR("expense")}>
-                      <Text style={[styles.tabText, { color: catTabR === "expense" ? "#fff" : colors.mutedForeground }]}>Rashodi</Text>
+                      <Text style={[styles.tabText, { color: catTabR === "expense" ? "#fff" : colors.mutedForeground }]}>{t("rep_expenses")}</Text>
                     </Pressable>
                   </View>
                   <DonutChart data={rangeCatTotals} type={catTabR} />
@@ -378,10 +353,10 @@ const styles = StyleSheet.create({
   modeBtn:     { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 10 },
   modeBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
 
-  pmBar:           { flexDirection: "row", borderRadius: 14, padding: 4, gap: 2 },
-  pmBtn:           { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 5, paddingVertical: 9, borderRadius: 10 },
-  pmBtnText:       { fontSize: 11, fontFamily: "Inter_600SemiBold" },
-  pmActiveBanner:  { flexDirection: "row", alignItems: "center", gap: 8, borderRadius: 10, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 8 },
+  pmBar:              { flexDirection: "row", borderRadius: 14, padding: 4, gap: 2 },
+  pmBtn:              { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 5, paddingVertical: 9, borderRadius: 10 },
+  pmBtnText:          { fontSize: 11, fontFamily: "Inter_600SemiBold" },
+  pmActiveBanner:     { flexDirection: "row", alignItems: "center", gap: 8, borderRadius: 10, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 8 },
   pmActiveBannerText: { fontSize: 13, fontFamily: "Inter_500Medium" },
 
   monthNav:   { flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderRadius: 14, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 10 },
