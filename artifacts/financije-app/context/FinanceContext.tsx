@@ -53,6 +53,9 @@ export const CURRENCIES: Currency[] = [
   { code: "CNY", symbol: "¥",    name: "Chinese Yuan",               position: "before" },
   { code: "AUD", symbol: "A$",   name: "Australian Dollar",          position: "before" },
   { code: "CAD", symbol: "CA$",  name: "Canadian Dollar",            position: "before" },
+  { code: "RUB", symbol: "₽",   name: "Russian Ruble",              position: "after"  },
+  { code: "MXN", symbol: "MX$", name: "Mexican Peso",               position: "before" },
+  { code: "ARS", symbol: "AR$", name: "Argentine Peso",             position: "before" },
 ];
 
 interface FinanceContextType {

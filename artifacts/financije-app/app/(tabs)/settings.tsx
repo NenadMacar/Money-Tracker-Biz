@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import {
   Alert,
+  BackHandler,
   FlatList,
   Modal,
   Platform,
@@ -76,6 +77,22 @@ export default function SettingsScreen() {
     Haptics.selectionAsync();
     setLanguage(code);
     setLangModalVisible(false);
+  }
+
+  function handleExit() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Alert.alert(t("set_exit"), t("set_exitConfirm"), [
+      { text: t("set_cancel"), style: "cancel" },
+      {
+        text: t("set_exit"), style: "destructive", onPress: () => {
+          if (Platform.OS === "android") {
+            BackHandler.exitApp();
+          } else if (Platform.OS === "web") {
+            window.close();
+          }
+        }
+      },
+    ]);
   }
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -162,6 +179,17 @@ export default function SettingsScreen() {
 
         {renderCategoryList(incomeCategories,  t("set_incomeCategories"))}
         {renderCategoryList(expenseCategories, t("set_expenseCategories"))}
+
+        {/* ── Exit App Button ── */}
+        <TouchableOpacity
+          style={[styles.exitBtn, { backgroundColor: colors.card, borderColor: "#ef444444" }]}
+          onPress={handleExit}
+          activeOpacity={0.7}
+          testID="exit-app-btn"
+        >
+          <Feather name="log-out" size={18} color="#ef4444" />
+          <Text style={[styles.exitBtnText, { color: "#ef4444" }]}>{t("set_exit")}</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       {/* ── Language Selection Modal ── */}
@@ -347,4 +375,7 @@ const styles = StyleSheet.create({
   iconsGrid:  { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
   iconOption: { width: 48, height: 48, borderRadius: 12, borderWidth: 1.5, alignItems: "center", justifyContent: "center" },
   error:      { fontSize: 14, fontFamily: "Inter_500Medium", marginTop: 8, textAlign: "center" },
+
+  exitBtn:     { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, padding: 16, borderRadius: 16, borderWidth: 1.5, marginTop: 8, marginBottom: 8 },
+  exitBtnText: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
 });
