@@ -2,10 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 export type TransactionType = "income" | "expense";
+export type PaymentMethod  = "bank" | "cash";
 
 export interface Transaction {
   id: string;
   type: TransactionType;
+  paymentMethod: PaymentMethod;
   amount: number;
   category: string;
   description: string;
@@ -115,7 +117,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         AsyncStorage.getItem(CATEGORIES_KEY),
         AsyncStorage.getItem(CURRENCY_KEY),
       ]);
-      if (txData)   setTransactions(JSON.parse(txData));
+      if (txData) {
+        const parsed: Transaction[] = JSON.parse(txData);
+        setTransactions(parsed.map(t => ({ paymentMethod: "bank" as PaymentMethod, ...t })));
+      }
       if (catData)  setCategories(JSON.parse(catData));
       if (currData) {
         const saved = CURRENCIES.find(c => c.code === currData);

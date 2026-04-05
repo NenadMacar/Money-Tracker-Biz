@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
-import { TransactionType, useFinance } from "@/context/FinanceContext";
+import { PaymentMethod, TransactionType, useFinance } from "@/context/FinanceContext";
 
 interface AddTransactionModalProps {
   visible: boolean;
@@ -32,6 +32,7 @@ export default function AddTransactionModal({
   const { categories, addTransaction, currency } = useFinance();
 
   const [type,             setType]             = useState<TransactionType>(defaultType);
+  const [paymentMethod,    setPaymentMethod]    = useState<PaymentMethod>("bank");
   const [amount,           setAmount]           = useState("");
   const [description,      setDescription]      = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -60,14 +61,14 @@ export default function AddTransactionModal({
     }
     setError("");
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    addTransaction({ type, amount: parseFloat(amount), category: selectedCategory, description, date });
+    addTransaction({ type, paymentMethod, amount: parseFloat(amount), category: selectedCategory, description, date });
     resetAndClose();
   }
 
   function resetAndClose() {
     setAmount(""); setDescription(""); setSelectedCategory("");
     setDate(new Date().toISOString().split("T")[0]);
-    setError(""); setType(defaultType);
+    setError(""); setType(defaultType); setPaymentMethod("bank");
     onClose();
   }
 
@@ -88,6 +89,7 @@ export default function AddTransactionModal({
           contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Income / Expense toggle */}
           <View style={[styles.typeToggle, { backgroundColor: colors.muted }]}>
             <Pressable
               style={[styles.typeBtn, type === "income" && { backgroundColor: colors.income }]}
@@ -109,6 +111,7 @@ export default function AddTransactionModal({
             </Pressable>
           </View>
 
+          {/* Amount */}
           <View style={[styles.amountContainer, { borderBottomColor: colors.border }]}>
             <Text style={[styles.currencySymbol, { color: colors.mutedForeground }]}>
               {currency.symbol}
@@ -124,6 +127,38 @@ export default function AddTransactionModal({
             />
           </View>
 
+          {/* Payment method */}
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>NAČIN PLAĆANJA</Text>
+          <View style={[styles.paymentToggle, { backgroundColor: colors.muted }]}>
+            <Pressable
+              style={[
+                styles.paymentBtn,
+                paymentMethod === "bank" && { backgroundColor: colors.primary },
+              ]}
+              onPress={() => setPaymentMethod("bank")}
+              testID="payment-bank"
+            >
+              <Feather name="credit-card" size={15} color={paymentMethod === "bank" ? "#fff" : colors.mutedForeground} />
+              <Text style={[styles.paymentBtnText, { color: paymentMethod === "bank" ? "#fff" : colors.mutedForeground }]}>
+                Tekući račun
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.paymentBtn,
+                paymentMethod === "cash" && { backgroundColor: "#854d0e" },
+              ]}
+              onPress={() => setPaymentMethod("cash")}
+              testID="payment-cash"
+            >
+              <Feather name="dollar-sign" size={15} color={paymentMethod === "cash" ? "#fff" : colors.mutedForeground} />
+              <Text style={[styles.paymentBtnText, { color: paymentMethod === "cash" ? "#fff" : colors.mutedForeground }]}>
+                Gotovina
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Date */}
           <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>DATUM</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
@@ -134,6 +169,7 @@ export default function AddTransactionModal({
             testID="date-input"
           />
 
+          {/* Description */}
           <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>OPIS (opcionalno)</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.foreground }]}
@@ -144,6 +180,7 @@ export default function AddTransactionModal({
             testID="description-input"
           />
 
+          {/* Category */}
           <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>KATEGORIJA</Text>
           <View style={styles.categoriesGrid}>
             {filteredCats.map(cat => (
@@ -199,23 +236,26 @@ export default function AddTransactionModal({
 }
 
 const styles = StyleSheet.create({
-  container:      { flex: 1 },
-  header:         { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 14, borderBottomWidth: 1 },
-  closeBtn:       { padding: 6 },
-  title:          { fontSize: 17, fontFamily: "Inter_600SemiBold" },
-  saveBtn:        { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
-  saveBtnText:    { fontSize: 14, fontFamily: "Inter_600SemiBold" },
-  content:        { padding: 20, gap: 8 },
-  typeToggle:     { flexDirection: "row", borderRadius: 14, padding: 4, marginBottom: 12 },
-  typeBtn:        { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 10 },
-  typeBtnText:    { fontSize: 14, fontFamily: "Inter_600SemiBold" },
-  amountContainer:{ flexDirection: "row", alignItems: "center", borderBottomWidth: 2, paddingBottom: 8, marginBottom: 20 },
-  currencySymbol: { fontSize: 28, fontFamily: "Inter_400Regular", marginRight: 8 },
-  amountInput:    { flex: 1, fontSize: 40, fontFamily: "Inter_700Bold" },
-  sectionLabel:   { fontSize: 11, fontFamily: "Inter_600SemiBold", letterSpacing: 1, marginTop: 12, marginBottom: 6 },
-  input:          { borderRadius: 12, borderWidth: 1, padding: 14, fontSize: 15, fontFamily: "Inter_400Regular", marginBottom: 4 },
-  categoriesGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
-  catChip:        { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5 },
-  catChipText:    { fontSize: 13, fontFamily: "Inter_500Medium" },
-  error:          { fontSize: 14, fontFamily: "Inter_500Medium", marginTop: 8, textAlign: "center" },
+  container:       { flex: 1 },
+  header:          { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 14, borderBottomWidth: 1 },
+  closeBtn:        { padding: 6 },
+  title:           { fontSize: 17, fontFamily: "Inter_600SemiBold" },
+  saveBtn:         { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
+  saveBtnText:     { fontSize: 14, fontFamily: "Inter_600SemiBold" },
+  content:         { padding: 20, gap: 8 },
+  typeToggle:      { flexDirection: "row", borderRadius: 14, padding: 4, marginBottom: 12 },
+  typeBtn:         { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 10 },
+  typeBtnText:     { fontSize: 14, fontFamily: "Inter_600SemiBold" },
+  amountContainer: { flexDirection: "row", alignItems: "center", borderBottomWidth: 2, paddingBottom: 8, marginBottom: 20 },
+  currencySymbol:  { fontSize: 28, fontFamily: "Inter_400Regular", marginRight: 8 },
+  amountInput:     { flex: 1, fontSize: 40, fontFamily: "Inter_700Bold" },
+  sectionLabel:    { fontSize: 11, fontFamily: "Inter_600SemiBold", letterSpacing: 1, marginTop: 12, marginBottom: 6 },
+  input:           { borderRadius: 12, borderWidth: 1, padding: 14, fontSize: 15, fontFamily: "Inter_400Regular", marginBottom: 4 },
+  paymentToggle:   { flexDirection: "row", borderRadius: 14, padding: 4 },
+  paymentBtn:      { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 10 },
+  paymentBtnText:  { fontSize: 13, fontFamily: "Inter_600SemiBold" },
+  categoriesGrid:  { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
+  catChip:         { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5 },
+  catChipText:     { fontSize: 13, fontFamily: "Inter_500Medium" },
+  error:           { fontSize: 14, fontFamily: "Inter_500Medium", marginTop: 8, textAlign: "center" },
 });

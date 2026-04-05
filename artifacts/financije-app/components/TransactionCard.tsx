@@ -18,6 +18,7 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
   const colors = useColors();
   const { deleteTransaction, categories, formatAmount } = useFinance();
   const isIncome = transaction.type === "income";
+  const isBank   = (transaction.paymentMethod ?? "bank") === "bank";
 
   const cat  = categories.find(c => c.name === transaction.category);
   const icon = (cat?.icon || "circle") as any;
@@ -50,9 +51,27 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
             {transaction.description}
           </Text>
         ) : null}
-        <Text style={[styles.date, { color: colors.mutedForeground }]}>
-          {formatDate(transaction.date)}
-        </Text>
+        <View style={styles.metaRow}>
+          <Text style={[styles.date, { color: colors.mutedForeground }]}>
+            {formatDate(transaction.date)}
+          </Text>
+          <View style={[
+            styles.paymentBadge,
+            {
+              backgroundColor: isBank ? "rgba(59,130,246,0.12)" : "rgba(133,77,14,0.12)",
+              borderColor:     isBank ? "rgba(59,130,246,0.3)"  : "rgba(133,77,14,0.3)",
+            },
+          ]}>
+            <Feather
+              name={isBank ? "credit-card" : "dollar-sign"}
+              size={10}
+              color={isBank ? "#3b82f6" : "#854d0e"}
+            />
+            <Text style={[styles.paymentBadgeText, { color: isBank ? "#3b82f6" : "#854d0e" }]}>
+              {isBank ? "Račun" : "Gotovina"}
+            </Text>
+          </View>
+        </View>
       </View>
 
       <View style={styles.right}>
@@ -81,19 +100,15 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  iconContainer: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  info:        { flex: 1, gap: 2 },
-  category:    { fontSize: 15, fontFamily: "Inter_600SemiBold" },
-  description: { fontSize: 13, fontFamily: "Inter_400Regular" },
-  date:        { fontSize: 12, fontFamily: "Inter_400Regular" },
-  right:       { alignItems: "flex-end", gap: 6 },
-  amount:      { fontSize: 15, fontFamily: "Inter_700Bold" },
-  deleteBtn:   { padding: 4 },
+  iconContainer:    { width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center", marginRight: 12, backgroundColor: "transparent" },
+  info:             { flex: 1, gap: 2 },
+  category:         { fontSize: 15, fontFamily: "Inter_600SemiBold" },
+  description:      { fontSize: 13, fontFamily: "Inter_400Regular" },
+  metaRow:          { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 2 },
+  date:             { fontSize: 12, fontFamily: "Inter_400Regular" },
+  paymentBadge:     { flexDirection: "row", alignItems: "center", gap: 3, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 20, borderWidth: 1 },
+  paymentBadgeText: { fontSize: 10, fontFamily: "Inter_600SemiBold" },
+  right:            { alignItems: "flex-end", gap: 6 },
+  amount:           { fontSize: 15, fontFamily: "Inter_700Bold" },
+  deleteBtn:        { padding: 4 },
 });
