@@ -18,7 +18,16 @@
     },
     "android": {},
     "web": {
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/icon.png",
+      "name": "MoFi",
+      "shortName": "MoFi",
+      "description": "Business finance tracker for small businesses",
+      "themeColor": "#1e40af",
+      "backgroundColor": "#1e40af",
+      "display": "standalone",
+      "orientation": "portrait",
+      "scope": "/",
+      "startUrl": "/"
     },
     "plugins": [
       [
