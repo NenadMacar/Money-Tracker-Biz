@@ -46,6 +46,7 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - Dark mode: automatically follows system setting (dark palette defined in constants/colors.ts)
 - PWA installable: manifest.json + icons in public/; web.display: standalone in app.json
 - i18n: English (default), Italian, Serbian, German, Russian, Spanish
+- **AI Assistant**: floating blue "cpu" button (bottom-left); opens chat modal "MoFi AI"; powered by OpenAI `gpt-5-mini` via API server; understands natural language in all 6 languages; supports add_transaction action with confirmation card; voice input via Web Speech API on web
 
 #### Design Tokens
 - Primary: `#1e40af` (navy blue) / dark mode: `#3b82f6`
@@ -73,6 +74,7 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 - `app/(tabs)/settings.tsx` — language, currency, categories, exit button
 - `components/TransactionCard.tsx` — transaction row with edit (pencil) and delete (trash) buttons
 - `components/AddTransactionModal.tsx` — add/edit transaction form (accepts `editingTransaction` prop)
+- `components/AiAssistantModal.tsx` — AI chat modal with message history, transaction confirmation card, voice input (web)
 - `components/MiniBarChart.tsx` — 6-month trend bar chart
 - `components/DonutChart.tsx` — category breakdown chart
 - `hooks/useColors.ts` — returns light or dark color palette based on system color scheme

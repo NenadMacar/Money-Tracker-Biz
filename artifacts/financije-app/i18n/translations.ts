@@ -151,6 +151,17 @@ const en = {
   con_deleteConfirm: "Are you sure you want to delete this contact?",
   con_cancel: "Cancel",
   con_errorName: "Enter a name",
+
+  ai_title: "MoFi AI",
+  ai_placeholder: "Ask me anything...",
+  ai_thinking: "Thinking...",
+  ai_recording: "Listening...",
+  ai_addConfirm: "Add this transaction?",
+  ai_addBtn: "Add",
+  ai_cancelBtn: "Cancel",
+  ai_addedOk: "Transaction added!",
+  ai_error: "Something went wrong. Try again.",
+  ai_welcome: "Hi! I can help you add transactions or check your finances. Try: \"Add income 500 for Services\"",
 };
 
 const it: TranslationKeys = {
@@ -286,6 +297,17 @@ const it: TranslationKeys = {
   con_deleteConfirm: "Sei sicuro di voler eliminare questo contatto?",
   con_cancel: "Annulla",
   con_errorName: "Inserisci un nome",
+
+  ai_title: "MoFi AI",
+  ai_placeholder: "Chiedimi qualcosa...",
+  ai_thinking: "Pensando...",
+  ai_recording: "In ascolto...",
+  ai_addConfirm: "Aggiungere questa transazione?",
+  ai_addBtn: "Aggiungi",
+  ai_cancelBtn: "Annulla",
+  ai_addedOk: "Transazione aggiunta!",
+  ai_error: "Qualcosa è andato storto. Riprova.",
+  ai_welcome: "Ciao! Posso aiutarti ad aggiungere transazioni o controllare le tue finanze. Prova: \"Aggiungi entrata 500 per Servizi\"",
 };
 
 const sr: TranslationKeys = {
@@ -421,6 +443,17 @@ const sr: TranslationKeys = {
   con_deleteConfirm: "Da li ste sigurni da želite obrisati ovaj kontakt?",
   con_cancel: "Otkaži",
   con_errorName: "Unesite naziv",
+
+  ai_title: "MoFi AI",
+  ai_placeholder: "Pitajte me nešto...",
+  ai_thinking: "Razmišljam...",
+  ai_recording: "Slušam...",
+  ai_addConfirm: "Dodati ovu transakciju?",
+  ai_addBtn: "Dodaj",
+  ai_cancelBtn: "Otkaži",
+  ai_addedOk: "Transakcija dodana!",
+  ai_error: "Nešto nije u redu. Pokušajte ponovo.",
+  ai_welcome: "Zdravo! Mogu vam pomoći da dodate transakcije ili provjerite finansije. Npr: \"Dodaj prihod 500 za Usluge\"",
 };
 
 const de: TranslationKeys = {
@@ -556,6 +589,17 @@ const de: TranslationKeys = {
   con_deleteConfirm: "Möchten Sie diesen Kontakt wirklich löschen?",
   con_cancel: "Abbrechen",
   con_errorName: "Bitte Namen eingeben",
+
+  ai_title: "MoFi AI",
+  ai_placeholder: "Fragen Sie mich...",
+  ai_thinking: "Denke nach...",
+  ai_recording: "Höre zu...",
+  ai_addConfirm: "Diese Transaktion hinzufügen?",
+  ai_addBtn: "Hinzufügen",
+  ai_cancelBtn: "Abbrechen",
+  ai_addedOk: "Transaktion hinzugefügt!",
+  ai_error: "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
+  ai_welcome: "Hallo! Ich helfe Ihnen, Transaktionen zu erfassen oder Ihre Finanzen zu überprüfen. Z.B.: \"Einnahme 500 für Dienstleistungen\"",
 };
 
 const ru: TranslationKeys = {
@@ -691,6 +735,17 @@ const ru: TranslationKeys = {
   con_deleteConfirm: "Вы уверены, что хотите удалить этот контакт?",
   con_cancel: "Отмена",
   con_errorName: "Введите название",
+
+  ai_title: "MoFi AI",
+  ai_placeholder: "Спросите меня...",
+  ai_thinking: "Думаю...",
+  ai_recording: "Слушаю...",
+  ai_addConfirm: "Добавить эту транзакцию?",
+  ai_addBtn: "Добавить",
+  ai_cancelBtn: "Отмена",
+  ai_addedOk: "Транзакция добавлена!",
+  ai_error: "Что-то пошло не так. Попробуйте ещё раз.",
+  ai_welcome: "Привет! Я помогу вам добавлять транзакции и проверять финансы. Попробуйте: «Доход 500 категория Услуги»",
 };
 
 const es: TranslationKeys = {
@@ -826,6 +881,17 @@ const es: TranslationKeys = {
   con_deleteConfirm: "¿Estás seguro de que quieres eliminar este contacto?",
   con_cancel: "Cancelar",
   con_errorName: "Ingresa un nombre",
+
+  ai_title: "MoFi AI",
+  ai_placeholder: "Pregúntame algo...",
+  ai_thinking: "Pensando...",
+  ai_recording: "Escuchando...",
+  ai_addConfirm: "¿Agregar esta transacción?",
+  ai_addBtn: "Agregar",
+  ai_cancelBtn: "Cancelar",
+  ai_addedOk: "¡Transacción agregada!",
+  ai_error: "Algo salió mal. Inténtalo de nuevo.",
+  ai_welcome: "¡Hola! Puedo ayudarte a agregar transacciones o revisar tus finanzas. Prueba: \"Agrega ingreso 500 por Servicios\"",
 };
 
 export const TRANSLATIONS: Record<LangCode, TranslationKeys> = { en, it, sr, de, ru, es };
