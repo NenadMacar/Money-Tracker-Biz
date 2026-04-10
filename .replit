@@ -24,3 +24,11 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+git remote add github
+https://github.com/NenadMacar/MoFi.git
+
+git config user.email "vas@email.com"
+git config user.name "Nenad Macar"
+
+git push github main
