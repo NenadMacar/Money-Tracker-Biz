@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { Alert, Platform } from "react-native";
 
 export type TransactionType = "income" | "expense";
 export type PaymentMethod  = "bank" | "cash";
@@ -65,7 +66,9 @@ interface FinanceContextType {
   setCurrency: (c: Currency) => void;
   formatAmount: (amount: number) => string;
   addTransaction: (t: Omit<Transaction, "id" | "createdAt">) => void;
+  updateTransaction: (id: string, updates: Partial<Omit<Transaction, "id" | "createdAt">>) => void;
   deleteTransaction: (id: string) => void;
+  exportCSV: (txsToExport?: Transaction[]) => void;
   addCategory: (c: Omit<Category, "id">) => void;
   deleteCategory: (id: string) => void;
   getTotalIncome: () => number;
@@ -167,10 +170,47 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     saveTransactions(updated);
   }
 
+  function updateTransaction(id: string, updates: Partial<Omit<Transaction, "id" | "createdAt">>) {
+    const updated = transactions.map(t => t.id === id ? { ...t, ...updates } : t);
+    setTransactions(updated);
+    saveTransactions(updated);
+  }
+
   function deleteTransaction(id: string) {
     const updated = transactions.filter(t => t.id !== id);
     setTransactions(updated);
     saveTransactions(updated);
+  }
+
+  function exportCSV(txsToExport?: Transaction[]) {
+    const data = txsToExport ?? transactions;
+    if (!data.length) {
+      Alert.alert("Export", "No transactions to export.");
+      return;
+    }
+    const header = "Date,Type,Category,Amount,Payment Method,Description";
+    const rows = data.map(t => {
+      const desc = (t.description || "").replace(/"/g, '""');
+      return `${t.date},${t.type},${t.category},${t.amount},${t.paymentMethod},"${desc}"`;
+    });
+    const csv = [header, ...rows].join("\n");
+
+    if (Platform.OS === "web") {
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `mofi-export-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else {
+      Alert.alert(
+        "CSV Export",
+        "Open MoFi in a browser to download the CSV file.",
+      );
+    }
   }
 
   function addCategory(c: Omit<Category, "id">) {
@@ -259,7 +299,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     <FinanceContext.Provider
       value={{
         transactions, categories, currency, setCurrency, formatAmount,
-        addTransaction, deleteTransaction, addCategory, deleteCategory,
+        addTransaction, updateTransaction, deleteTransaction, exportCSV,
+        addCategory, deleteCategory,
         getTotalIncome, getTotalExpenses, getBalance,
         getTransactionsByMonth, getTransactionsByDateRange,
         getCategoryTotals, getCategoryTotalsByRange, getMonthlyTrends,

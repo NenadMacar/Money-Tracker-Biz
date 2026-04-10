@@ -44,7 +44,7 @@ export default function ReportsScreen() {
   const { t, locale } = useI18n();
   const {
     getTransactionsByMonth, getTransactionsByDateRange,
-    getMonthlyTrends, formatAmount, categories,
+    getMonthlyTrends, formatAmount, categories, exportCSV,
   } = useFinance();
 
   const now = new Date();
@@ -184,7 +184,17 @@ export default function ReportsScreen() {
           { paddingTop: topPad + 16, paddingBottom: (Platform.OS === "web" ? 34 : insets.bottom) + 100 },
         ]}
       >
-        <Text style={[styles.title, { color: colors.foreground }]}>{t("rep_title")}</Text>
+        <View style={styles.titleRow}>
+          <Text style={[styles.title, { color: colors.foreground }]}>{t("rep_title")}</Text>
+          <TouchableOpacity
+            style={[styles.exportBtn, { backgroundColor: colors.primary + "18", borderColor: colors.primary + "40" }]}
+            onPress={() => exportCSV(mode === "monthly" ? monthTxs : rangeTxs)}
+            testID="export-csv-btn"
+          >
+            <Feather name="download" size={14} color={colors.primary} />
+            <Text style={[styles.exportBtnText, { color: colors.primary }]}>CSV</Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={[styles.modeToggle, { backgroundColor: colors.muted }]}>
           <Pressable style={[styles.modeBtn, mode === "monthly" && { backgroundColor: colors.primary }]} onPress={() => setMode("monthly")}>
@@ -345,9 +355,12 @@ export default function ReportsScreen() {
 }
 
 const styles = StyleSheet.create({
-  root:    { flex: 1 },
-  content: { paddingHorizontal: 16, gap: 12 },
-  title:   { fontSize: 26, fontFamily: "Inter_700Bold", marginBottom: 4 },
+  root:          { flex: 1 },
+  content:       { paddingHorizontal: 16, gap: 12 },
+  titleRow:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 4 },
+  title:         { fontSize: 26, fontFamily: "Inter_700Bold" },
+  exportBtn:     { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20, borderWidth: 1.5 },
+  exportBtnText: { fontSize: 12, fontFamily: "Inter_700Bold" },
 
   modeToggle:  { flexDirection: "row", borderRadius: 14, padding: 4 },
   modeBtn:     { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 10 },

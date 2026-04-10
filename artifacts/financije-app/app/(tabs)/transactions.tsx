@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
-import { TransactionType, useFinance } from "@/context/FinanceContext";
+import { Transaction, TransactionType, useFinance } from "@/context/FinanceContext";
 import { useI18n } from "@/context/I18nContext";
 import TransactionCard from "@/components/TransactionCard";
 import AddTransactionModal from "@/components/AddTransactionModal";
@@ -27,6 +27,7 @@ export default function TransactionsScreen() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<TransactionType>("expense");
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
 
   const filtered = useMemo(() => {
     if (filter === "all") return transactions;
@@ -35,8 +36,19 @@ export default function TransactionsScreen() {
 
   function handleAdd(type: TransactionType) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setEditingTransaction(undefined);
     setModalType(type);
     setModalVisible(true);
+  }
+
+  function handleEdit(tx: Transaction) {
+    setEditingTransaction(tx);
+    setModalVisible(true);
+  }
+
+  function handleCloseModal() {
+    setModalVisible(false);
+    setEditingTransaction(undefined);
   }
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -118,7 +130,7 @@ export default function TransactionsScreen() {
             </TouchableOpacity>
           </View>
         }
-        renderItem={({ item }) => <TransactionCard transaction={item} />}
+        renderItem={({ item }) => <TransactionCard transaction={item} onEdit={handleEdit} />}
       />
 
       <View style={[styles.fab, { bottom: (Platform.OS === "web" ? 34 : insets.bottom) + 90 }]}>
@@ -140,8 +152,9 @@ export default function TransactionsScreen() {
 
       <AddTransactionModal
         visible={modalVisible}
-        onClose={() => setModalVisible(false)}
+        onClose={handleCloseModal}
         defaultType={modalType}
+        editingTransaction={editingTransaction}
       />
     </View>
   );

@@ -94,6 +94,7 @@ const en = {
   set_exitConfirm: "Are you sure you want to exit?",
 
   mod_title: "New Transaction",
+  mod_editTitle: "Edit Transaction",
   mod_save: "Save",
   mod_income: "Income",
   mod_expense: "Expense",
@@ -228,6 +229,7 @@ const it: TranslationKeys = {
   set_exitConfirm: "Sei sicuro di voler uscire?",
 
   mod_title: "Nuova transazione",
+  mod_editTitle: "Modifica transazione",
   mod_save: "Salva",
   mod_income: "Entrata",
   mod_expense: "Uscita",
@@ -362,6 +364,7 @@ const sr: TranslationKeys = {
   set_exitConfirm: "Da li ste sigurni da želite izaći?",
 
   mod_title: "Nova transakcija",
+  mod_editTitle: "Uredi transakciju",
   mod_save: "Sačuvaj",
   mod_income: "Prihod",
   mod_expense: "Rashod",
@@ -496,6 +499,7 @@ const de: TranslationKeys = {
   set_exitConfirm: "Möchten Sie die App wirklich beenden?",
 
   mod_title: "Neue Transaktion",
+  mod_editTitle: "Transaktion bearbeiten",
   mod_save: "Speichern",
   mod_income: "Einnahme",
   mod_expense: "Ausgabe",
@@ -630,6 +634,7 @@ const ru: TranslationKeys = {
   set_exitConfirm: "Вы уверены, что хотите выйти?",
 
   mod_title: "Новая транзакция",
+  mod_editTitle: "Редактировать транзакцию",
   mod_save: "Сохранить",
   mod_income: "Доход",
   mod_expense: "Расход",
@@ -764,6 +769,7 @@ const es: TranslationKeys = {
   set_exitConfirm: "¿Estás seguro de que quieres salir?",
 
   mod_title: "Nueva transacción",
+  mod_editTitle: "Editar transacción",
   mod_save: "Guardar",
   mod_income: "Ingreso",
   mod_expense: "Gasto",

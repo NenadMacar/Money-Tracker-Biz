@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Modal,
   Platform,
@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
-import { PaymentMethod, TransactionType, useFinance } from "@/context/FinanceContext";
+import { PaymentMethod, Transaction, TransactionType, useFinance } from "@/context/FinanceContext";
 import { useContacts } from "@/context/ContactsContext";
 import { useI18n } from "@/context/I18nContext";
 
@@ -22,17 +22,19 @@ interface AddTransactionModalProps {
   visible: boolean;
   onClose: () => void;
   defaultType?: TransactionType;
+  editingTransaction?: Transaction;
 }
 
 export default function AddTransactionModal({
   visible,
   onClose,
   defaultType = "expense",
+  editingTransaction,
 }: AddTransactionModalProps) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { t } = useI18n();
-  const { categories, addTransaction, currency } = useFinance();
+  const { categories, addTransaction, updateTransaction, currency } = useFinance();
   const { contacts } = useContacts();
 
   const [type,             setType]             = useState<TransactionType>(defaultType);
@@ -45,6 +47,36 @@ export default function AddTransactionModal({
   const [contactSearch,    setContactSearch]    = useState("");
   const [contactPickerOpen, setContactPickerOpen] = useState(false);
   const [error,            setError]            = useState("");
+
+  useEffect(() => {
+    if (visible && !editingTransaction) {
+      setType(defaultType);
+      setAmount("");
+      setDescription("");
+      setSelectedCategory("");
+      setDate(new Date().toISOString().split("T")[0]);
+      setPaymentMethod("bank");
+      setContactId(undefined);
+      setContactSearch("");
+      setContactPickerOpen(false);
+      setError("");
+    }
+  }, [visible, defaultType]);
+
+  useEffect(() => {
+    if (editingTransaction) {
+      setType(editingTransaction.type);
+      setPaymentMethod(editingTransaction.paymentMethod ?? "bank");
+      setAmount(editingTransaction.amount.toString());
+      setDescription(editingTransaction.description || "");
+      setSelectedCategory(editingTransaction.category);
+      setDate(editingTransaction.date);
+      setContactId(editingTransaction.contactId);
+      setContactSearch("");
+      setContactPickerOpen(false);
+      setError("");
+    }
+  }, [editingTransaction]);
 
   const filteredCats = categories.filter(c => c.type === type);
 
@@ -80,7 +112,11 @@ export default function AddTransactionModal({
     }
     setError("");
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    addTransaction({ type, paymentMethod, amount: parseFloat(amount), category: selectedCategory, description, date, contactId });
+    if (editingTransaction) {
+      updateTransaction(editingTransaction.id, { type, paymentMethod, amount: parseFloat(amount), category: selectedCategory, description, date, contactId });
+    } else {
+      addTransaction({ type, paymentMethod, amount: parseFloat(amount), category: selectedCategory, description, date, contactId });
+    }
     resetAndClose();
   }
 
@@ -99,7 +135,7 @@ export default function AddTransactionModal({
           <TouchableOpacity onPress={resetAndClose} style={styles.closeBtn}>
             <Feather name="x" size={22} color={colors.foreground} />
           </TouchableOpacity>
-          <Text style={[styles.title, { color: colors.foreground }]}>{t("mod_title")}</Text>
+          <Text style={[styles.title, { color: colors.foreground }]}>{editingTransaction ? t("mod_editTitle") : t("mod_title")}</Text>
           <TouchableOpacity onPress={handleSave} style={[styles.saveBtn, { backgroundColor: colors.primary }]}>
             <Text style={[styles.saveBtnText, { color: colors.primaryForeground }]}>{t("mod_save")}</Text>
           </TouchableOpacity>

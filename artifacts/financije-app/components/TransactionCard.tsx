@@ -8,9 +8,10 @@ import { useI18n } from "@/context/I18nContext";
 
 interface TransactionCardProps {
   transaction: Transaction;
+  onEdit?: (transaction: Transaction) => void;
 }
 
-export default function TransactionCard({ transaction }: TransactionCardProps) {
+export default function TransactionCard({ transaction, onEdit }: TransactionCardProps) {
   const colors = useColors();
   const { t, locale } = useI18n();
   const { deleteTransaction, categories, formatAmount } = useFinance();
@@ -71,9 +72,20 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
         <Text style={[styles.amount, { color: isIncome ? colors.income : colors.expense }]}>
           {isIncome ? "+" : "-"}{formatAmount(transaction.amount)}
         </Text>
-        <TouchableOpacity onPress={handleDelete} style={styles.deleteBtn} testID="delete-transaction">
-          <Feather name="trash-2" size={15} color={colors.mutedForeground} />
-        </TouchableOpacity>
+        <View style={styles.actionRow}>
+          {onEdit && (
+            <TouchableOpacity
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onEdit(transaction); }}
+              style={styles.actionBtn}
+              testID="edit-transaction"
+            >
+              <Feather name="edit-2" size={14} color={colors.primary} />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity onPress={handleDelete} style={styles.actionBtn} testID="delete-transaction">
+            <Feather name="trash-2" size={14} color={colors.mutedForeground} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -103,5 +115,6 @@ const styles = StyleSheet.create({
   paymentBadgeText: { fontSize: 10, fontFamily: "Inter_600SemiBold" },
   right:            { alignItems: "flex-end", gap: 6 },
   amount:           { fontSize: 15, fontFamily: "Inter_700Bold" },
-  deleteBtn:        { padding: 4 },
+  actionRow:        { flexDirection: "row", gap: 4 },
+  actionBtn:        { padding: 5 },
 });
